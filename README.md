@@ -1,2 +1,4 @@
 # SmartSpray
-Homeassistant irrigation system
+Homeassistant irrigation system for esp32 chipset
+
+
