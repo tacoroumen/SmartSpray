@@ -3,6 +3,42 @@ views:
   - path: default_view
     title: Home
     cards:
+      - type: entities
+        title: Run Zones
+        entities:
+          - entity: switch.irrigation_zone_1
+            type: custom:multiple-entity-row
+            name: Run Zone 1
+            toggle: true
+            state_color: true
+            entities:
+              - entity: sensor.zone_1_remaining
+                name: remaining
+          - entity: switch.irrigation_zone_2
+            type: custom:multiple-entity-row
+            name: Run Zone 2
+            toggle: true
+            state_color: true
+            entities:
+              - entity: sensor.zone_2_remaining
+                name: remaining
+          - entity: switch.irrigation_zone_3
+            type: custom:multiple-entity-row
+            name: Run Zone 3
+            toggle: true
+            state_color: true
+            entities:
+              - entity: sensor.zone_3_remaining
+                name: remaining
+          - entity: switch.irrigation_zone_4
+            type: custom:multiple-entity-row
+            name: Run Zone 4
+            toggle: true
+            state_color: true
+            entities:
+              - entity: sensor.zone_4_remaining
+                name: remaining
+        show_header_toggle: false
       - type: vertical-stack
         cards:
           - type: entities
@@ -88,3 +124,8 @@ views:
                 entities:
                   - entity: number.zone_4_duration
                     name: duration
+      - type: weather-forecast
+        entity: weather.home
+        show_forecast: false
+      - type: entity
+        entity: sensor.time
