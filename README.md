@@ -1,0 +1,2 @@
+# SmartSpray
+Homeassistant irrigation system
