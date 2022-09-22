@@ -12,9 +12,10 @@ preferences:
   flash_write_interval: 1min
 
 wifi:
-  ssid: {secret wifi_ssid}
+  ssid: {wifi_ssid}
   password: {wifi_password}
-
+  fast_connect: true
+  
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Hassio"
@@ -31,19 +32,20 @@ time:
 
 globals:
   - id: var_zone_remainings
-    type: int[6]
-    initial_value: "{0, 0, 0, 0, 0, 0}"
+    type: int[4]
+    initial_value: "{0, 0, 0, 0}"
+  - id: days_to_run
+    type: int[8]
+    initial_value: "{0, 0, 0, 0, 0, 0, 0, 0}"
 
 # Enable Home Assistant API
 api:
   reboot_timeout: 0s
 
-
 button:
   - platform: restart
     id: irrigation_restart
     name: "Irrigation Restart"
-
 
 binary_sensor:
   # Connection status
@@ -59,22 +61,20 @@ binary_sensor:
     on_click:
       - max_length: 2s
         then:
-          - switch.toggle: irrigation_manual
       - min_length: 2s
         max_length: 5s
         then:
           - switch.turn_off: automation_enabled
-          - script.execute: turn_off_valves_and_pump
+          - script.execute: turn_off_valves
       - min_length: 5s
         max_length: 10s
         then:
           - switch.turn_on: automation_enabled
 
-
 select:
   - platform: template
-    name: "Zone 1 start"
-    id: zone1_start
+    name: "Irrigation start"
+    id: irrigation_start
     options: &start_options
       ["00:00", "00:15", "00:30", "00:45",
        "01:00", "01:15", "01:30", "01:45",
@@ -101,7 +101,7 @@ select:
        "22:00", "22:15", "22:30", "22:45",
        "23:00", "23:15", "23:30", "23:45",
       ]
-    initial_option: "20:00"
+    initial_option: "18:00"
     optimistic: true
     restore_value: true
   - platform: template
@@ -115,14 +115,14 @@ select:
     name: "Zone 3 start"
     id: zone3_start
     options: *start_options
-    initial_option: "20:30"
+    initial_option: "20:00"
     optimistic: true
     restore_value: true
   - platform: template
     name: "Zone 4 start"
     id: zone4_start
     options: *start_options
-    initial_option: "19:30"
+    initial_option: "20:30"
     optimistic: true
     restore_value: true
 
@@ -133,8 +133,8 @@ number:
     name: "Zone 1 duration"
     step: 1
     min_value: 0
-    max_value: 120
-    initial_value: 30
+    max_value: 15
+    initial_value: 5
     unit_of_measurement: min
     optimistic: true
     restore_value: true
@@ -143,8 +143,8 @@ number:
     name: "Zone 2 duration"
     step: 1
     min_value: 0
-    max_value: 120
-    initial_value: 45
+    max_value: 15
+    initial_value: 5
     unit_of_measurement: min
     optimistic: true
     restore_value: true
@@ -153,8 +153,8 @@ number:
     name: "Zone 3 duration"
     step: 1
     min_value: 0
-    max_value: 120
-    initial_value: 30
+    max_value: 15
+    initial_value: 5
     unit_of_measurement: min
     optimistic: true
     restore_value: true
@@ -163,8 +163,8 @@ number:
     name: "Zone 4 duration"
     step: 1
     min_value: 0
-    max_value: 120
-    initial_value: 30
+    max_value: 15
+    initial_value: 5
     unit_of_measurement: min
     optimistic: true
     restore_value: true
@@ -177,12 +177,6 @@ sensor:
   #
   # Template Sensors
   #
-  - platform: template
-    id: manual_remaining
-    name: "Manual pump remaining"
-    accuracy_decimals: 0
-    unit_of_measurement: min
-    lambda: "return id(var_pump_remaining);"
   - platform: template
     id: zone1_remaining
     name: "Zone 1 remaining"
@@ -214,39 +208,20 @@ switch:
   # Template Switches
   #
   - platform: template
-    name: "Irrigation Manual"
-    id: irrigation_manual
-    lambda: "return id(irrigation_pump).state;"
-    turn_on_action:
-      - switch.turn_on: irrigation_pump
-      - script.execute: manual_pump_wait
-      - script.wait: manual_pump_wait
-      - script.execute: turn_off_pump_if_valves_are_closed
-    turn_off_action:
-      - script.stop: manual_pump_wait
-      - lambda: |-
-          id(var_pump_remaining) = 0;
-          id(manual_remaining).update();
-      - script.execute: turn_off_pump_if_valves_are_closed
-
-  - platform: template
     name: "Irrigation Zone 1"
     id: irrigation_zone1
     lambda: 'return id(irrigation_channel1).state;'
     turn_on_action:
       - switch.turn_on: irrigation_channel1
-      - switch.turn_on: irrigation_pump
       - script.execute: zone1_wait
       - script.wait: zone1_wait
       - switch.turn_off: irrigation_channel1
-      - script.execute: turn_off_pump_if_valves_are_closed
     turn_off_action:
       - script.stop: zone1_wait
       - lambda: |-
           id(var_zone_remainings)[0] = 0;
           id(zone1_remaining).update();
       - switch.turn_off: irrigation_channel1
-      - script.execute: turn_off_pump_if_valves_are_closed
 
   - platform: template
     name: "Irrigation Zone 2"
@@ -254,18 +229,15 @@ switch:
     lambda: 'return id(irrigation_channel2).state;'
     turn_on_action:
       - switch.turn_on: irrigation_channel2
-      - switch.turn_on: irrigation_pump
       - script.execute: zone2_wait
       - script.wait: zone2_wait
       - switch.turn_off: irrigation_channel2
-      - script.execute: turn_off_pump_if_valves_are_closed
     turn_off_action:
       - script.stop: zone2_wait
       - lambda: |-
           id(var_zone_remainings)[1] = 0;
           id(zone2_remaining).update();
       - switch.turn_off: irrigation_channel2
-      - script.execute: turn_off_pump_if_valves_are_closed
 
   - platform: template
     name: "Irrigation Zone 3"
@@ -273,18 +245,15 @@ switch:
     lambda: 'return id(irrigation_channel3).state;'
     turn_on_action:
       - switch.turn_on: irrigation_channel3
-      - switch.turn_on: irrigation_pump
       - script.execute: zone3_wait
       - script.wait: zone3_wait
       - switch.turn_off: irrigation_channel3
-      - script.execute: turn_off_pump_if_valves_are_closed
     turn_off_action:
       - script.stop: zone3_wait
       - lambda: |-
           id(var_zone_remainings)[2] = 0;
           id(zone3_remaining).update();
       - switch.turn_off: irrigation_channel3
-      - script.execute: turn_off_pump_if_valves_are_closed
 
   - platform: template
     name: "Irrigation Zone 4"
@@ -292,20 +261,95 @@ switch:
     lambda: 'return id(irrigation_channel4).state;'
     turn_on_action:
       - switch.turn_on: irrigation_channel4
-      - switch.turn_on: irrigation_pump
       - script.execute: zone4_wait
       - script.wait: zone4_wait
       - switch.turn_off: irrigation_channel4
-      - script.execute: turn_off_pump_if_valves_are_closed
     turn_off_action:
       - script.stop: zone4_wait
       - lambda: |-
           id(var_zone_remainings)[3] = 0;
           id(zone4_remaining).update();
       - switch.turn_off: irrigation_channel4
-      - script.execute: turn_off_pump_if_valves_are_closed
 
+  - platform: template
+    name: "Mon"
+    id: irrigation_monday
+    optimistic: true
+    restore_state: true
+    turn_on_action:
+      - lambda: |-
+          id(days_to_run)[2] = 1;
+    turn_off_action:
+      - lambda: |-
+          id(days_to_run)[2] = 0;
+  - platform: template
+    name: "Tue"
+    id: irrigation_tuesday
+    optimistic: true
+    restore_state: true
+    turn_on_action:
+      - lambda: |-
+          id(days_to_run)[3] = 1;
+    turn_off_action:
+      - lambda: |-
+          id(days_to_run)[3] = 0;
+  - platform: template
+    name: "Wed"
+    id: irrigation_wednesday
+    optimistic: true
+    restore_state: true
+    turn_on_action:
+      - lambda: |-
+          id(days_to_run)[4] = 1;
+    turn_off_action:
+      - lambda: |-
+          id(days_to_run)[4] = 0;
+  - platform: template
+    name: "Thu"
+    id: irrigation_thursday
+    optimistic: true
+    restore_state: true
+    turn_on_action:
+      - lambda: |-
+          id(days_to_run)[5] = 1;
+    turn_off_action:
+      - lambda: |-
+          id(days_to_run)[5] = 0;
+  - platform: template
+    name: "Fri"
+    id: irrigation_friday
+    optimistic: true
+    restore_state: true
+    turn_on_action:
+      - lambda: |-
+          id(days_to_run)[6] = 1;
+    turn_off_action:
+      - lambda: |-
+          id(days_to_run)[6] = 0;
+  - platform: template
+    name: "Sat"
+    id: irrigation_saturday
+    optimistic: true
+    restore_state: true
+    turn_on_action:
+      - lambda: |-
+          id(days_to_run)[7] = 1;
+    turn_off_action:
+      - lambda: |-
+          id(days_to_run)[7] = 0;
+  - platform: template
+    name: "Sun"
+    id: irrigation_sunday
+    optimistic: true
+    restore_state: true
+    turn_on_action:
+      - lambda: |-
+          id(days_to_run)[1] = 1;
+    turn_off_action:
+      - lambda: |-
+          id(days_to_run)[1] = 0;
 
+    
   - platform: template
     name: "Zone 1 enabled"
     id: zone1_enabled
@@ -352,6 +396,7 @@ switch:
     id: irrigation_channel2
     pin: GPIO27
     inverted: true
+    restore_mode: ALWAYS_OFF
 
   - platform: gpio
     id: irrigation_channel1
@@ -364,49 +409,17 @@ switch:
 # Scripts
 #
 script:
-  - id: turn_off_pump_if_valves_are_closed
+  - id: turn_off_valves
     then:
-      - if:
-          condition:
-            and:
-              - switch.is_off: irrigation_channel1
-              - switch.is_off: irrigation_channel2
-              - switch.is_off: irrigation_channel3
-              - switch.is_off: irrigation_channel4
-          then:
-            - if:
-                condition:
-                  not:
-                    script.is_running: manual_pump_wait
-                then:
-                  - switch.turn_off: irrigation_pump
-                  - script.stop: manual_pump_wait
-
-  - id: turn_off_valves_and_pump
-    then:
-      - switch.turn_off: irrigation_manual
       - switch.turn_off: irrigation_zone1
       - switch.turn_off: irrigation_zone2
       - switch.turn_off: irrigation_zone3
       - switch.turn_off: irrigation_zone4
-
-  - id: manual_pump_wait
-    then:
-      - lambda: |-
-          id(var_pump_remaining) = id(var_pump_duration);
-          id(manual_remaining).update();
-      - while:
-          condition:
-            lambda: "return id(var_pump_remaining) > 0;"
-          then:
-            - delay: 1min
-            - lambda: |-
-                id(var_pump_remaining) -= 1;
-                id(manual_remaining).update();
+      
   - id: zone1_wait
     then:
       - lambda: |-
-          id(var_zone_remainings)[0] = id(zone1_duration).state  * id(time_multiplier).state / 100;
+          id(var_zone_remainings)[0] = id(zone1_duration).state;
           id(zone1_remaining).update();
       - while:
           condition:
@@ -419,7 +432,7 @@ script:
   - id: zone2_wait
     then:
       - lambda: |-
-          id(var_zone_remainings)[1] = id(zone2_duration).state  * id(time_multiplier).state / 100;
+          id(var_zone_remainings)[1] = id(zone2_duration).state;
           id(zone2_remaining).update();
       - while:
           condition:
@@ -432,7 +445,7 @@ script:
   - id: zone3_wait
     then:
       - lambda: |-
-          id(var_zone_remainings)[2] = id(zone3_duration).state  * id(time_multiplier).state / 100;
+          id(var_zone_remainings)[2] = id(zone3_duration).state;
           id(zone3_remaining).update();
       - while:
           condition:
@@ -445,7 +458,7 @@ script:
   - id: zone4_wait
     then:
       - lambda: |-
-          id(var_zone_remainings)[3] = id(zone4_duration).state  * id(time_multiplier).state / 100;
+          id(var_zone_remainings)[3] = id(zone4_duration).state;
           id(zone4_remaining).update();
       - while:
           condition:
@@ -455,20 +468,23 @@ script:
             - lambda: |-
                 id(var_zone_remainings)[3] -= 1;
                 id(zone4_remaining).update();
+
 #
 # Time automations
 #
 interval:
   - interval: 1sec
     then:
-      - lambda: |-
+     - lambda: |-
           // automation overall switch
-          if (!id(automation_enabled).state) return;
-          int current_day = id(homeassistant_time).now().timestamp / 86400;
+             if (!id(automation_enabled).state) return;
+          // Check if today is an active irrigation
+          int current_day = id(homeassistant_time).now().day_of_week;
+          if ((id(days_to_run)[current_day]) == 0) return;
           // time based
           if (id(zone1_enabled).state &&
             !id(irrigation_zone1).state &&
-            id(homeassistant_time).now().strftime("%H:%M") == id(zone1_start).state)
+            id(homeassistant_time).now().strftime("%H:%M") == id(irrigation_start).state)
               id(irrigation_zone1).turn_on();
           if (id(zone2_enabled).state &&
             !id(irrigation_zone2).state &&
@@ -482,3 +498,4 @@ interval:
             !id(irrigation_zone4).state &&
             id(homeassistant_time).now().strftime("%H:%M") == id(zone4_start).state)
               id(irrigation_zone4).turn_on();
+ 
