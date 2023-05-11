@@ -89,28 +89,6 @@ select:
     initial_option: "18:00"
     optimistic: true
     restore_value: true
-  #- platform: template
-  #  name: "zone 2 start"
-  #  id: zone2_start
-  #  options: *start_options
-  #  initial_option: "18:45"
-  #  optimistic: True
-  #  restore_value: True
-  #- platform: template
-  #  name: "zone 2 start"
-  #  id: zone3_start
-  #  options: *start_options
-  #  initial_option: "18:45"
-  #  optimistic: True
-  #  restore_value: True
-  #- platform: template
-  #  name: "zone 2 start"
-  #  id: zone4_start
-  #  options: *start_options
-  #  initial_option: "18:45"
-  #  optimistic: True
-  #  restore_value: True
-
 
 number:
   - platform: template
@@ -518,3 +496,4 @@ interval:
             !id(irrigation_zone4).state &&
             id(homeassistant_time).now().strftime("%H:%M") == id(irrigation_start).state && id(zone1_enabled).state == 0 && id(zone2_enabled).state == 0 && id(zone3_enabled).state == 0)
               id(irrigation_zone4).turn_on();
+ 
