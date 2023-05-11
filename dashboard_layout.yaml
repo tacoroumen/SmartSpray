@@ -5,73 +5,17 @@ views:
     badges: []
     cards:
       - type: entities
-        title: Run Zones
         entities:
-          - entity: switch.irrigation_zone_1
-            style: |
-              :host {
-                {% if states('switch.irrigation_zone_1') == 'on' %}
-                  --paper-item-icon-active-color: #03A9F4;
-                  {% elif states('switch.irrigation_zone_1')  == 'off'%}
-                  --paper-item-icon-color: #4c4c4c;
-                {% endif %};
-              }
+          - entity: sensor.time
+          - entity: sensor.buienradar_rain_1d
             type: custom:multiple-entity-row
-            name: Run Zone 1
-            toggle: true
-            state_color: true
+            name: Rainfall past day
             entities:
-              - entity: sensor.zone_1_remaining
-                name: remaining
-          - entity: switch.irrigation_zone_2
-            style: |
-              :host {
-                {% if states('switch.irrigation_zone_2') == 'on' %}
-                  --paper-item-icon-active-color: #03A9F4;
-                  {% elif states('switch.irrigation_zone_2')  == 'off'%}
-                  --paper-item-icon-color: #4c4c4c;
-                {% endif %};
-              }
+              - entity: number.max_mm_of_rainfall
+          - entity: sensor.buienradar_temperature
             type: custom:multiple-entity-row
-            name: Run Zone 2
-            toggle: true
-            state_color: true
             entities:
-              - entity: sensor.zone_2_remaining
-                name: remaining
-          - entity: switch.irrigation_zone_3
-            style: |
-              :host {
-                {% if states('switch.irrigation_zone_3') == 'on' %}
-                  --paper-item-icon-active-color: #03A9F4;
-                  {% elif states('switch.irrigation_zone_3')  == 'off'%}
-                  --paper-item-icon-color: #4c4c4c;
-                {% endif %};
-              }
-            type: custom:multiple-entity-row
-            name: Run Zone 3
-            toggle: true
-            state_color: true
-            entities:
-              - entity: sensor.zone_3_remaining
-                name: remaining
-          - entity: switch.irrigation_zone_4
-            style: |
-              :host {
-                {% if states('switch.irrigation_zone_4') == 'on' %}
-                  --paper-item-icon-active-color: #03A9F4;
-                  {% elif states('switch.irrigation_zone_4')  == 'off'%}
-                  --paper-item-icon-color: #4c4c4c;
-                {% endif %};
-              }
-            type: custom:multiple-entity-row
-            name: Run Zone 4
-            toggle: true
-            state_color: true
-            entities:
-              - entity: sensor.zone_4_remaining
-                name: remaining
-        show_header_toggle: false
+              - entity: number.minimum_temperature
       - type: vertical-stack
         cards:
           - type: entities
@@ -87,114 +31,50 @@ views:
                 tap_action:
                   action: toggle
                 entity: switch.mon
-                card_mod:
-                  style: |
-                    ha-card{
-                      {% if states('switch.mon') == 'on' %}
-                        --paper-item-icon-active-color: #03A9F4;
-                      {% elif states('switch.mon')  == 'off'%}
-                        --paper-item-icon-color: #4c4c4c;
-                      {% endif %};
-                    }
               - show_name: true
                 show_icon: true
                 type: button
                 tap_action:
                   action: toggle
                 entity: switch.tue
-                card_mod:
-                  style: |
-                    ha-card{
-                      {% if states('switch.tue') == 'on' %}
-                        --paper-item-icon-active-color: #03A9F4;
-                      {% elif states('switch.tue')  == 'off'%}
-                        --paper-item-icon-color: #4c4c4c;
-                      {% endif %};
-                    }
               - show_name: true
                 show_icon: true
                 type: button
                 tap_action:
                   action: toggle
                 entity: switch.wed
-                card_mod:
-                  style: |
-                    ha-card{
-                      {% if states('switch.wed') == 'on' %}
-                        --paper-item-icon-active-color: #03A9F4;
-                      {% elif states('switch.wed')  == 'off'%}
-                        --paper-item-icon-color: #4c4c4c;
-                      {% endif %};
-                    }
               - show_name: true
                 show_icon: true
                 type: button
                 tap_action:
                   action: toggle
                 entity: switch.thu
-                card_mod:
-                  style: |
-                    ha-card{
-                      {% if states('switch.thu') == 'on' %}
-                        --paper-item-icon-active-color: #03A9F4;
-                      {% elif states('switch.thu')  == 'off'%}
-                        --paper-item-icon-color: #4c4c4c;
-                      {% endif %};
-                    }
               - show_name: true
                 show_icon: true
                 type: button
                 tap_action:
                   action: toggle
                 entity: switch.fri
-                card_mod:
-                  style: |
-                    ha-card{
-                      {% if states('switch.fri') == 'on' %}
-                        --paper-item-icon-active-color: #03A9F4;
-                      {% elif states('switch.fri')  == 'off'%}
-                        --paper-item-icon-color: #4c4c4c;
-                      {% endif %};
-                    }
               - show_name: true
                 show_icon: true
                 type: button
                 tap_action:
                   action: toggle
                 entity: switch.sat
-                card_mod:
-                  style: |
-                    ha-card{
-                      {% if states('switch.sat') == 'on' %}
-                        --paper-item-icon-active-color: #03A9F4;
-                      {% elif states('switch.sat')  == 'off'%}
-                        --paper-item-icon-color: #4c4c4c;
-                      {% endif %};
-                    }
               - show_name: true
                 show_icon: true
                 type: button
                 tap_action:
                   action: toggle
                 entity: switch.sun
-                card_mod:
-                  style: |
-                    ha-card{
-                      {% if states('switch.sun') == 'on' %}
-                        --paper-item-icon-active-color: #03A9F4;
-                      {% elif states('switch.sun')  == 'off'%}
-                        --paper-item-icon-color: #4c4c4c;
-                      {% endif %};
-                    }
           - type: entities
             entities:
               - entity: switch.zone_1_enabled
                 style: |
                   :host {
-                    {% if states('switch.zone_1_enabled') == 'on' %}
-                      --paper-item-icon-active-color: #03A9F4;
-                      {% elif states('switch.zone_1_enabled')  == 'off'%}
-                      --paper-item-icon-color: #4c4c4c;
+                    {% if states('switch.irrigation_zone_1') == 'on' %}
+                      --rgb-state-switch-color: #00FF00;
+                      --paper-item-icon-color: #00FF00
                     {% endif %};
                   }
                 type: custom:multiple-entity-row
@@ -207,10 +87,9 @@ views:
               - entity: switch.zone_2_enabled
                 style: |
                   :host {
-                    {% if states('switch.zone_2_enabled') == 'on' %}
-                      --paper-item-icon-active-color: #03A9F4;
-                      {% elif states('switch.zone_2_enabled')  == 'off'%}
-                      --paper-item-icon-color: #4c4c4c;
+                    {% if states('switch.irrigation_zone_2') == 'on' %}
+                      --rgb-state-switch-color: #00FF00;
+                      --paper-item-icon-color: #00FF00
                     {% endif %};
                   }
                 type: custom:multiple-entity-row
@@ -223,10 +102,9 @@ views:
               - entity: switch.zone_3_enabled
                 style: |
                   :host {
-                    {% if states('switch.zone_3_enabled') == 'on' %}
-                      --paper-item-icon-active-color: #03A9F4;
-                      {% elif states('switch.zone_3_enabled')  == 'off'%}
-                      --paper-item-icon-color: #4c4c4c;
+                    {% if states('switch.irrigation_zone_3') == 'on' %}
+                      --rgb-state-switch-color: #00FF00;
+                      --paper-item-icon-color: #00FF00
                     {% endif %};
                   }
                 type: custom:multiple-entity-row
@@ -239,10 +117,9 @@ views:
               - entity: switch.zone_4_enabled
                 style: |
                   :host {
-                    {% if states('switch.zone_4_enabled') == 'on' %}
-                      --paper-item-icon-active-color: #03A9F4;
-                      {% elif states('switch.zone_4_enabled')  == 'off'%}
-                      --paper-item-icon-color: #4c4c4c;
+                    {% if states('switch.irrigation_zone_4') == 'on' %}
+                      --rgb-state-switch-color: #00FF00;
+                      --paper-item-icon-color: #00FF00
                     {% endif %};
                   }
                 type: custom:multiple-entity-row
@@ -253,10 +130,3 @@ views:
                   - entity: number.zone_4_duration
                     name: duration
             state_color: false
-      - type: entities
-        entities:
-          - entity: sensor.time
-          - entity: sensor.buienradar_rain_last_24h
-      - type: weather-forecast
-        entity: weather.home
-        show_forecast: false
