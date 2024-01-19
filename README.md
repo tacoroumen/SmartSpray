@@ -1,8 +1,3 @@
-## SmartSpray
-### Homeassistant irrigation system for esp32 chipset.
-
-#### Preview of the made home assistant dashboard.
-![Preview of the made home assistant dashboard](./irrigation.PNG)
 
 
 # SmartSpray Irrigation System
@@ -14,6 +9,10 @@ SmartSpray is an irrigation system controlled by Home Assistant and implemented 
 ## Dashboard
 
 The `dashboard_layout.yaml` file defines the layout of the irrigation dashboard in Home Assistant.
+
+#### Preview of the made home assistant dashboard.
+![Preview of the made home assistant dashboard](./irrigation.PNG)
+
 
 ### Irrigation Overview
 
