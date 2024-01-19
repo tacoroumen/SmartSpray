@@ -95,5 +95,3 @@ The `ESP32code.yaml` file contains the ESPHome configuration for the irrigation 
 3. Adjust irrigation settings such as start time, zone durations, and conditions in Home Assistant.
 4. Flash the ESP32 with the provided configuration.
 5. Monitor and control the irrigation system through the Home Assistant dashboard.
-
-Note: Ensure that the [`multiple-entity-row`](https://github.com/benct/lovelace-multiple-entity-row) element is installed and added as a resource in your Home Assistant installation for the dashboard to function properly.
