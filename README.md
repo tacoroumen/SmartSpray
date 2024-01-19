@@ -1,8 +1,8 @@
 ## SmartSpray
 ### Homeassistant irrigation system for esp32 chipset.
-#### Preview of the made home assistant dashboard.
 
-<a href="/irrigation.PNG"><img src="./irrigation.PNG" align="left" style="margin-right:10000000px;"></a>
+#### Preview of the made home assistant dashboard.
+![Preview of the made home assistant dashboard](./irrigation.PNG)
 
 
 # SmartSpray Irrigation System
