@@ -11,7 +11,7 @@ SmartSpray is an irrigation system controlled by Home Assistant and implemented 
 The `dashboard_layout.yaml` file defines the layout of the irrigation dashboard in Home Assistant.
 
 #### Preview of the made home assistant dashboard.
-![Preview of the made home assistant dashboard](./irrigation.PNG)
+![Preview of the made home assistant dashboard](./Pictures/irrigation.PNG)
 
 
 ### Irrigation Overview
